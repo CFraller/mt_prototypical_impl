@@ -217,7 +217,7 @@ ui <- fluidPage(
         fluidRow(
           div(style = "height:10px;"), column(8, h4("Table 1: Results of flexible budgeting using an capacity-based ABC approach with flexible and committed resources grouped by periods"))
         ),
-        fluidRow(DT::dataTableOutput("table_result1")),
+        fluidRow(DT::dataTableOutput("table_main_result")),
         fluidRow(
           div(style = "height:10px;"),
           column(5, h4("Table 2: Cost pool data of selected period grouped by activities and res.")),
@@ -225,8 +225,8 @@ ui <- fluidPage(
         ),
         fluidRow(
           div(style = "height:5px;"),
-          column(4, DT::dataTableOutput("table_result2")),
-          column(7, DT::dataTableOutput("table_result3"), offset = 1)
+          column(4, DT::dataTableOutput("table_cost_pool")),
+          column(7, DT::dataTableOutput("table_activity_pool"), offset = 1)
         )
       )
     ),
@@ -237,7 +237,7 @@ ui <- fluidPage(
           12, titlePanel("Chart of Accounts"),
           offset = 5
         )),
-        DT::dataTableOutput("table_accounts")
+        DT::dataTableOutput("table_chart_of_accounts")
       )
     ),
     tabPanel(
@@ -247,7 +247,7 @@ ui <- fluidPage(
           12, titlePanel("Bill of Material (BOM)"),
           offset = 5
         )),
-        DT::dataTableOutput("table_items")
+        DT::dataTableOutput("table_bill_of_materials")
       )
     ),
     tabPanel(
@@ -256,17 +256,17 @@ ui <- fluidPage(
         fluidRow(column(12, titlePanel("Routing"),
           offset = 5
         )),
-        DT::dataTableOutput("table_activities")
+        DT::dataTableOutput("table_rounting")
       )
     ),
     navbarMenu(
       "More",
       tabPanel(
-        "About",
+        "txt_about",
         fluidPage(
           fluidRow(
-            column(2, uiOutput("img")),
-            column(4, textOutput("about"))
+            column(2, uiOutput("img_tuwien_logo")),
+            column(4, textOutput("txt_about"))
           )
         )
       ),
