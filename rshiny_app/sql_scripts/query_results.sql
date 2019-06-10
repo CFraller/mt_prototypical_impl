@@ -7,7 +7,7 @@ SELECT
 	MaterialExpenseProduct2,
 	ExpenseChargedToProduct1,
 	ExpenseChargedToProduct2,
-	SUM(ExpenseChargedToProducts) AS ExpenseChargedToProducts,
+	(ExpenseChargedToProduct1 + ExpenseChargedToProduct2) AS ExpenseChargedToProducts,
 	SUM(CommittedExpense) AS CommittedExpense, 
 	SUM(FlexibleExpense) AS FlexibleExpense, 
 	SUM(UnusedCapacity) AS UnusedCapacity, 

@@ -14,7 +14,7 @@ UPDATE TB_Resource_Expense_Structure
 UPDATE TB_Cost_Pool_Position
 	SET ActualOverheadExpenseResourceActivity = temp.ActualOverheadExpenseResourceActivity
 	FROM (SELECT PeriodID, ActivityID, TB_Resource_Cost_Driver_Rate.ResourceType,
-			SUM(Rate*ActualOverheadExpenseResource) AS ActualOverheadExpenseResourceActivity,
+			SUM(ROUND(Rate*ActualOverheadExpenseResource, 2)) AS ActualOverheadExpenseResourceActivity,
 			Variator
 		  FROM TB_Resource_Cost_Driver_Rate
 			JOIN TB_Resource_Expense_Structure
@@ -28,7 +28,7 @@ UPDATE TB_Cost_Pool_Position
 UPDATE TB_Activity_Level_Structure
 	SET ActualActivityLevel = temp.ActualActivityLevel
 	FROM (SELECT PeriodID, TB_Quantity_Structure.FinishedGoodID, ActivityID, 
-			ActualVolume*ActivityCostDriverQuantity AS ActualActivityLevel
+			ROUND(ActualVolume*ActivityCostDriverQuantity, 2) AS ActualActivityLevel
 		  FROM TB_Quantity_Structure
 			JOIN TB_Routing_Position
 				ON TB_Quantity_Structure.FinishedGoodID = TB_Routing_Position.FinishedGoodID) AS temp
@@ -56,15 +56,15 @@ UPDATE TB_Activity_Pool_Position
 	
 -- Update activity pool position with CapacityUtilizationVariance
 UPDATE TB_Activity_Pool_Position
-	SET CapacityUtilizationVariance = (BudgetedActivityLevel - ActualActivityLevel) * CapacityDriverRate;
+	SET CapacityUtilizationVariance = ROUND((BudgetedActivityLevel - ActualActivityLevel) * CapacityDriverRate, 2);
 
 -- Update activity pool position with ExpenseChargedToProducts
 UPDATE TB_Activity_Pool_Position
-	SET ExpenseChargedToProducts = (CapacityDriverRate + BudgetedDriverRate) * ActualActivityLevel;
+	SET ExpenseChargedToProducts = ROUND((CapacityDriverRate + BudgetedDriverRate) * ActualActivityLevel, 2);
 
 -- Update activity pool position with FlexibleBudget
 UPDATE TB_Activity_Pool_Position
-	SET FlexibleBudget = CommittedExpense + (BudgetedDriverRate * ActualActivityLevel);
+	SET FlexibleBudget = ROUND(CommittedExpense + (BudgetedDriverRate * ActualActivityLevel), 2);
 
 -- Update activity pool position with SpendingVariance
 UPDATE TB_Activity_Pool_Position

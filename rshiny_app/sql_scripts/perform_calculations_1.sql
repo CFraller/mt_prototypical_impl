@@ -6,7 +6,7 @@ UPDATE TB_Resource_Cost_Driver_Rate
 -- Insert resource expense structure data (transactional data)
 INSERT INTO TB_Resource_Expense_Structure(PeriodID, ResourceType, Variator, BudgetedOverheadExpenseResource)
 	SELECT TB_Account_Expense_Structure.PeriodID, TB_General_Ledger_Account.ResourceType, 
-		SUM(TB_Account_Expense_Structure.Variator) / COUNT(TB_General_Ledger_Account.ResourceType) AS Variator ,
+		ROUND(SUM(TB_Account_Expense_Structure.Variator) / COUNT(TB_General_Ledger_Account.ResourceType), 2) AS Variator ,
 		SUM(TB_Account_Expense_Structure.BudgetedOverheadExpense) AS BudgetedOverheadExpenseResource 
 	FROM TB_General_Ledger_Account
 		JOIN TB_Account_Expense_Structure
@@ -17,8 +17,8 @@ INSERT INTO TB_Resource_Expense_Structure(PeriodID, ResourceType, Variator, Budg
 -- Insert activity level structure data (transactional data)
 INSERT INTO TB_Activity_Level_Structure(PeriodID, FinishedGoodID, ActivityID, CapacityActivityLevel, BudgetedActivityLevel)
 	SELECT PeriodID, TB_Quantity_Structure.FinishedGoodID, ActivityID, 
-		CapacityVolume*ActivityCostDriverQuantity AS CapacityActivityLevel, 
-		BudgetedVolume*ActivityCostDriverQuantity AS BudgetedActivityLevel
+		ROUND(CapacityVolume*ActivityCostDriverQuantity, 2) AS CapacityActivityLevel, 
+		ROUND(BudgetedVolume*ActivityCostDriverQuantity, 2) AS BudgetedActivityLevel
 	FROM TB_Quantity_Structure
 		JOIN TB_Routing_Position
 			ON TB_Quantity_Structure.FinishedGoodID = TB_Routing_Position.FinishedGoodID
@@ -27,7 +27,7 @@ INSERT INTO TB_Activity_Level_Structure(PeriodID, FinishedGoodID, ActivityID, Ca
 -- Insert cost pool position data (transactional data)
 INSERT INTO TB_Cost_Pool_Position(PeriodID, ActivityID, ResourceType, BudgetedOverheadExpenseResourceActivity, Variator)
 	SELECT PeriodID, ActivityID, TB_Resource_Cost_Driver_Rate.ResourceType,
-		SUM(Rate*BudgetedOverheadExpenseResource) AS BudgetedOverheadExpenseResourceActivity,
+		SUM(ROUND(Rate*BudgetedOverheadExpenseResource, 2)) AS BudgetedOverheadExpenseResourceActivity,
 		Variator
 	FROM TB_Resource_Cost_Driver_Rate
 		JOIN TB_Resource_Expense_Structure
@@ -39,18 +39,18 @@ INSERT INTO TB_Cost_Pool_Position(PeriodID, ActivityID, ResourceType, BudgetedOv
 INSERT INTO TB_Activity_Pool_Position(PeriodID, ActivityID, BudgetedOverheadExpenseActivity, Variator)
 	SELECT TB_Cost_Pool_Position.PeriodID, TB_Cost_Pool_Position.ActivityID, 
 		SUM(BudgetedOverheadExpenseResourceActivity) AS BudgetedOverheadExpenseActivity, 
-		SUM(BudgetedOverheadExpenseResourceActivity*Variator) / SUM(BudgetedOverheadExpenseResourceActivity) AS Variator
+		SUM(ROUND(BudgetedOverheadExpenseResourceActivity*Variator, 2)) / SUM(BudgetedOverheadExpenseResourceActivity) AS Variator
 	FROM TB_Cost_Pool_Position
 	GROUP BY TB_Cost_Pool_Position.PeriodID, TB_Cost_Pool_Position.ActivityID
 	ON CONFLICT (PeriodID, ActivityID) DO NOTHING;
 
 -- Update CommittedExpense in activity pool position data
 UPDATE TB_Activity_Pool_Position
-	SET CommittedExpense = BudgetedOverheadExpenseActivity - (Variator * BudgetedOverheadExpenseActivity);
+	SET CommittedExpense = ROUND(BudgetedOverheadExpenseActivity - (Variator * BudgetedOverheadExpenseActivity), 2);
 
 -- Update FlexibleExpense in activity pool position data
 UPDATE TB_Activity_Pool_Position
-	SET FlexibleExpense = Variator * BudgetedOverheadExpenseActivity;
+	SET FlexibleExpense = ROUND(Variator * BudgetedOverheadExpenseActivity, 2);
 
 -- Update CapacityActivityLevel in activity pool position data
 UPDATE TB_Activity_Pool_Position
@@ -70,15 +70,15 @@ UPDATE TB_Activity_Pool_Position
 
 -- Update CapacityDriverRate in activity pool position data
 UPDATE TB_Activity_Pool_Position
-	SET CapacityDriverRate = CommittedExpense / CapacityActivityLevel;
+	SET CapacityDriverRate = ROUND(CommittedExpense / CapacityActivityLevel, 2);
 	
 -- Update BudgetedDriverRate in activity pool position data
 UPDATE TB_Activity_Pool_Position
-	SET BudgetedDriverRate = FlexibleExpense / BudgetedActivityLevel;
+	SET BudgetedDriverRate = ROUND(FlexibleExpense / BudgetedActivityLevel, 2);
 	
 -- Update UnusedCapacity in activity pool position data
 UPDATE TB_Activity_Pool_Position
-	SET UnusedCapacity = (CapacityActivityLevel - BudgetedActivityLevel) * CapacityDriverRate;
+	SET UnusedCapacity = ROUND((CapacityActivityLevel - BudgetedActivityLevel) * CapacityDriverRate, 2);
 
 -- Update cost object structure with MaterialUnitExpense
 UPDATE TB_Cost_Object_Structure
@@ -140,7 +140,7 @@ UPDATE TB_Cost_Object_Structure
 	SET CommittedUnitExpense = temp.CommittedUnitExpense 
 	FROM (SELECT TB_Activity_Pool_Position.PeriodID, 
 			TB_Routing_Position.FinishedGoodID,
-			SUM(TB_Activity_Pool_Position.CapacityDriverRate*TB_Routing_Position.ActivityCostDriverQuantity) AS CommittedUnitExpense
+			SUM(ROUND(TB_Activity_Pool_Position.CapacityDriverRate*TB_Routing_Position.ActivityCostDriverQuantity, 2)) AS CommittedUnitExpense
 		  FROM TB_Activity_Pool_Position
 			JOIN TB_Routing_Position
 				ON TB_Activity_Pool_Position.ActivityID = TB_Routing_Position.ActivityID
@@ -153,7 +153,7 @@ UPDATE TB_Cost_Object_Structure
 	SET FlexibleUnitExpense = temp.FlexibleUnitExpense 
 	FROM (SELECT TB_Activity_Pool_Position.PeriodID, 
 			TB_Routing_Position.FinishedGoodID,
-			SUM(TB_Activity_Pool_Position.BudgetedDriverRate*TB_Routing_Position.ActivityCostDriverQuantity) AS FlexibleUnitExpense
+			SUM(ROUND(TB_Activity_Pool_Position.BudgetedDriverRate*TB_Routing_Position.ActivityCostDriverQuantity, 2)) AS FlexibleUnitExpense
 		  FROM TB_Activity_Pool_Position
 			JOIN TB_Routing_Position
 				ON TB_Activity_Pool_Position.ActivityID = TB_Routing_Position.ActivityID
