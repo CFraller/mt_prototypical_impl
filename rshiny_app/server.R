@@ -148,7 +148,7 @@ loadActivityPoolTable <- function(periodId) {
 }
 
 # Loading data of chart of accounts table from database
-loadChartOfAccountsTableTable <- function() {
+loadChartOfAccountsTable <- function() {
   data <- sqldf(
     "
     SELECT
@@ -411,7 +411,7 @@ server <- function(input, output, session) {
   output$table_activity_pool <- DT::renderDT(datatable(NULL))
 
   # Loading content of chart of accounts
-  output$table_chart_of_accounts <- loadChartOfAccountsTableTable()
+  output$table_chart_of_accounts <- loadChartOfAccountsTable()
 
   # Loading content of bill of materials
   output$table_bill_of_materials <- loadBillOfMaterialTable()
