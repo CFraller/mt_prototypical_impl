@@ -262,7 +262,7 @@ ui <- fluidPage(
     navbarMenu(
       "More",
       tabPanel(
-        "txt_about",
+        "About",
         fluidPage(
           fluidRow(
             column(2, uiOutput("img_tuwien_logo")),

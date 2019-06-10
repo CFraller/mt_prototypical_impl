@@ -411,7 +411,7 @@ server <- function(input, output, session) {
   output$table_activity_pool <- DT::renderDT(datatable(NULL))
 
   # Loading content of chart of accounts
-  output$table_chart_of_accounts <- loadChartOfAccountsTable()
+  output$table_chart_of_accounts <- loadChartOfAccountsTableTable()
 
   # Loading content of bill of materials
   output$table_bill_of_materials <- loadBillOfMaterialTable()
@@ -421,7 +421,7 @@ server <- function(input, output, session) {
 
   # Displaying the TU Wien logo
   output$img_tuwien_logo <- renderUI({
-    tags$img_tuwien_logo(src = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/TU_Wien-Logo.svg/200px-TU_Wien-Logo.svg.png")
+    tags$img(src = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/TU_Wien-Logo.svg/200px-TU_Wien-Logo.svg.png")
   })
 
   # Displaying the "txt_about" - statement
@@ -580,7 +580,7 @@ server <- function(input, output, session) {
             volumesInputFields$ActVol[i],
             value = getColumnOfQuantityStructure(
               "ActualVolume",
-              period,
+              periodId,
               volumesInputFields$FinishedGood[i]
             )
           )
@@ -592,7 +592,7 @@ server <- function(input, output, session) {
             expensesInputFields$ActExp[i],
             value = getColumnOfExpenseStructure(
               "ActualOverheadExpense",
-              period,
+              periodId,
               expensesInputFields$Account[i]
             )
           )
