@@ -7,8 +7,8 @@ require("DT")
 
 # Initializing PostgreSQL database
 initializeDatabase <- function() {
-  sqldf(paste(readLines("./sql_scripts/create_tables.sql"), collapse = "\n"))
-  sqldf(paste(readLines("./sql_scripts/insert_data.sql"), collapse = "\n"))
+  sqldf(paste(readLines("./sql_scripts/initialize_create_tables.sql"), collapse = "\n"))
+  sqldf(paste(readLines("./sql_scripts/initialize_insert_data.sql"), collapse = "\n"))
 }
 
 # Loading data of the main results table from database
@@ -685,7 +685,7 @@ server <- function(input, output, session) {
       )
     )
     sqldf(paste(
-      readLines("./sql_scripts/insert_data_naivecallibration_1.sql"),
+      readLines("./sql_scripts/naive_callibration_1.sql"),
       collapse = "\n"
     ))
     sqldf(
@@ -705,7 +705,7 @@ server <- function(input, output, session) {
       )
     )
     sqldf(paste(
-      readLines("./sql_scripts/insert_data_naivecallibration_2.sql"),
+      readLines("./sql_scripts/naive_callibration_2.sql"),
       collapse = "\n"
     ))
     periods <- sqldf("
@@ -743,7 +743,7 @@ server <- function(input, output, session) {
       )
     }
     sqldf(paste(
-      readLines("./sql_scripts/perform_calculations_1.sql"),
+      readLines("./sql_scripts/user_input_1.sql"),
       collapse = "\n"
     ))
     sqldf(
@@ -781,7 +781,7 @@ server <- function(input, output, session) {
       )
     }
     sqldf(paste(
-      readLines("./sql_scripts/perform_calculations_2.sql"),
+      readLines("./sql_scripts/user_input_2.sql"),
       collapse = "\n"
     ))
     sqldf(
@@ -838,7 +838,7 @@ server <- function(input, output, session) {
 
   # Reset database event
   observeEvent(input$reset_db_button, {
-    sqldf(paste(readLines("./sql_scripts/drop_tables.sql"), collapse = "\n"))
+    sqldf(paste(readLines("./sql_scripts/reset_drop_tables.sql"), collapse = "\n"))
     initializeDatabase()
     output$table_main_result <- loadMainResultTable()
     output$table_cost_pool <- DT::renderDT(datatable(NULL))
