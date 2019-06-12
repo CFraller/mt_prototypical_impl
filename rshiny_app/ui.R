@@ -16,8 +16,8 @@ ui <- fluidPage(
       "Estimation of Parameters",
       value = "Estimation of Parameters",
       fluidRow(column(
-        12, titlePanel("Estimation of Parameters"),
-        offset = 5
+        12, titlePanel("Estimation of budgeted and actual parameters"),
+        offset = 4
       )),
       fluidPage(
         fluidRow(
@@ -47,7 +47,6 @@ ui <- fluidPage(
           div(style = "height:20px;"), h4("Option 2: Add a new planning period using data from user input")
         ),
         fluidRow(
-          div(style = "height:10px;"),
           column(
             2,
             actionButton(
@@ -55,6 +54,21 @@ ui <- fluidPage(
               "Add new period (user input)",
               width = "80%",
               style = "padding:12px; margin-top:20px;"
+            )
+          ),
+          column(6, div(style = "height:10px;"), h4("Estimation of budgeted parameters: cap. volumes, bud. volumes, bud. expenses, and variators")),
+          column(4, div(style = "height:10px;"), h4("Estimation of actual parameters: act. volumes and act. expenses", offset = 1))
+        ),
+        fluidRow(
+          div(style = "height:10px;"),
+          column(
+            2,
+            selectInput(
+              "select_period",
+              "Select planning period",
+              choices = c("0"),
+              selected = "0",
+              width = "80%"
             )
           ),
           column(
@@ -67,7 +81,7 @@ ui <- fluidPage(
           ),
           column(
             2,
-            textInput("699_var_input", "Var. of '699 Disc. Personnel'", width = "80%")
+            textInput("699_var_input", "Variator of '699 Disc. Personnel'", width = "80%")
           ),
           column(
             2,
@@ -81,17 +95,8 @@ ui <- fluidPage(
         fluidRow(
           column(
             2,
-            selectInput(
-              "select_period",
-              "Select planning period",
-              choices = c("0"),
-              selected = "0",
-              width = "80%"
-            )
-          ),
-          column(
-            2,
-            textInput("bud_vol_input_x1", "Bud. volume of Slot Car X1", width = "80%")
+            textInput("bud_vol_input_x1", "Bud. volume of Slot Car X1", width = "80%"),
+            offset = 2
           ),
           column(
             2,
@@ -99,7 +104,7 @@ ui <- fluidPage(
           ),
           column(
             2,
-            textInput("700_var_input", "Var. of '700 Depreciation'", width = "80%")
+            textInput("700_var_input", "Variator of '700 Depreciation'", width = "80%")
           ),
           column(
             2,
@@ -122,7 +127,7 @@ ui <- fluidPage(
           ),
           column(
             2,
-            textInput("709_var_input", "Var. of '709 Operating exp.'", width = "80%")
+            textInput("709_var_input", "Variator of '709 Operating exp.'", width = "80%")
           ),
           column(
             2,
@@ -142,7 +147,7 @@ ui <- fluidPage(
           ),
           column(
             2,
-            textInput("720_var_input", "Var. of '720 Maint. costs'", width = "80%")
+            textInput("720_var_input", "Variator of '720 Maint. costs'", width = "80%")
           ),
           column(
             2,
@@ -158,7 +163,7 @@ ui <- fluidPage(
           ),
           column(
             2,
-            textInput("798_var_input", "Var. of '798 Admin. exp.'", width = "80%")
+            textInput("798_var_input", "Variator of '798 Admin. exp.'", width = "80%")
           ),
           column(
             2,
@@ -211,11 +216,11 @@ ui <- fluidPage(
       "Inspection of Results",
       fluidPage(
         fluidRow(column(
-          12, titlePanel("Inspection of Results"),
-          offset = 5
+          12, titlePanel("Results of flexible budgeting using an capacity-based ABC approach with flexible and committed resources"),
+          offset = 1
         )),
         fluidRow(
-          div(style = "height:10px;"), column(8, h4("Table 1: Results of flexible budgeting using an capacity-based ABC approach with flexible and committed resources grouped by periods"))
+          div(style = "height:10px;"), column(8, h4("Table 1: Results of flexible budgeting grouped by periods"))
         ),
         fluidRow(DT::dataTableOutput("table_main_result")),
         fluidRow(
