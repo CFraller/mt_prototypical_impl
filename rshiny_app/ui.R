@@ -16,8 +16,8 @@ ui <- fluidPage(
       "Estimation of Parameters",
       value = "Estimation of Parameters",
       fluidRow(column(
-        12, titlePanel("Estimation of budgeted and actual parameters"),
-        offset = 4
+        12, titlePanel("Estimation of budgeted parameters and realization of actual parameters"),
+        offset = 3
       )),
       fluidPage(
         fluidRow(
@@ -57,7 +57,7 @@ ui <- fluidPage(
             )
           ),
           column(6, div(style = "height:10px;"), h4("Estimation of budgeted parameters: cap. volumes, bud. volumes, bud. expenses, and variators")),
-          column(4, div(style = "height:10px;"), h4("Estimation of actual parameters: act. volumes and act. expenses", offset = 1))
+          column(4, div(style = "height:10px;"), h4("Realization of actual parameters: act. volumes and act. expenses", offset = 1))
         ),
         fluidRow(
           div(style = "height:10px;"),
