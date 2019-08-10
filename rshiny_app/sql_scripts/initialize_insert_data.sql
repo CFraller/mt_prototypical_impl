@@ -325,7 +325,7 @@ UPDATE TB_Resource_Cost_Driver_Rate
 -- Insert resource expense structure data (transactional data)
 INSERT INTO TB_Resource_Expense_Structure(PeriodID, ResourceType, Variator, BudgetedOverheadExpenseResource)
 	SELECT TB_Account_Expense_Structure.PeriodID, TB_General_Ledger_Account.ResourceType, 
-		SUM(TB_Account_Expense_Structure.Variator) / COUNT(TB_General_Ledger_Account.ResourceType) AS Variator,
+		SUM(TB_Account_Expense_Structure.BudgetedOverheadExpense*TB_Account_Expense_Structure.Variator) / SUM(TB_Account_Expense_Structure.BudgetedOverheadExpense) AS Variator,
 		SUM(TB_Account_Expense_Structure.BudgetedOverheadExpense) AS BudgetedOverheadExpenseResource 
 	FROM TB_General_Ledger_Account
 		JOIN TB_Account_Expense_Structure
