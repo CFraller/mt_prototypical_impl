@@ -73,10 +73,10 @@ loadCostPoolTable <- function(periodId) {
                 ActivityID, 
                 ResourceType, 
                 Variator, 
-                BudgetedOverheadExpenseResourceActivity, 
-                ActualOverheadExpenseResourceActivity 
+                BudgetedCostPoolExpense, 
+                ActualCostPoolExpense 
                 FROM 
-                TB_Cost_Pool_Position
+                TB_Cost_Pool
                 WHERE PeriodID = %s
                 ORDER BY ActivityID;", periodId))
   dt <- datatable(
@@ -92,8 +92,8 @@ loadCostPoolTable <- function(periodId) {
     )
   ) %>%
     formatRound(columns = "variator", digits = 2) %>%
-    formatCurrency(columns = "budgetedoverheadexpenseresourceactivity") %>%
-    formatCurrency(columns = "actualoverheadexpenseresourceactivity")
+    formatCurrency(columns = "budgetedcostpoolexpense") %>%
+    formatCurrency(columns = "actualcostpoolexpense")
   tabl <- DT::renderDT(dt)
   return(tabl)
 }
@@ -113,7 +113,7 @@ loadActivityPoolTable <- function(periodId) {
                          SpendingVariance, 
                          FlexibleBudget
                          FROM 
-                         TB_Activity_Pool_Position
+                         TB_Activity_Pool
                          WHERE PeriodID = %s
                          ORDER BY ActivityID;
                          ", periodId))
@@ -228,11 +228,11 @@ loadRouting <- function() {
     StdProdCoefPers,
     StdProdCoefEquip
     FROM
-    TB_Routing_Position
+    TB_Routing
     LEFT JOIN
     TB_Activity
     ON
-    TB_Routing_Position.ActivityID = TB_Activity.ActivityID;
+    TB_Routing.ActivityID = TB_Activity.ActivityID;
     "
   )
   dt <- datatable(
@@ -278,7 +278,7 @@ getColumnOfQuantityStructure <- function(column, periodId, finishedGoodId) {
     sprintf(
       "
       SELECT %s
-      FROM TB_Quantity_Structure
+      FROM TB_Production_Volume
       WHERE PeriodID = %s AND FinishedGoodID = %s;
       ",
       column,
@@ -295,7 +295,7 @@ getColumnOfExpenseStructure <- function(column, periodId, accountId) {
     sprintf(
       "
       SELECT %s
-      FROM TB_Account_Expense_Structure
+      FROM TB_Operating_Expense
       WHERE PeriodID = %s AND AccountID = %s;
       ",
       column,
@@ -311,7 +311,7 @@ insertQuantityStructure <- function(periodId, finishedGoodId, capacityVolume, bu
   sqldf(
     sprintf(
       "
-        INSERT INTO TB_Quantity_Structure(PeriodID, FinishedGoodID, CapacityVolume, BudgetedVolume)
+        INSERT INTO TB_Production_Volume(PeriodID, FinishedGoodID, CapacityVolume, BudgetedVolume)
         VALUES (%s, %s, %s, %s)
         ON CONFLICT (PeriodID, FinishedGoodID) DO NOTHING;
         ",
@@ -328,7 +328,7 @@ updateQuantityStructure <- function(periodId, finishedGoodId, actualVolume) {
   sqldf(
     sprintf(
       "
-      UPDATE TB_Quantity_Structure
+      UPDATE TB_Production_Volume
       SET ActualVolume = %s
       WHERE PeriodID = %s AND FinishedGoodID = %s;
       ",
@@ -344,7 +344,7 @@ insertExpenseStructure <- function(periodId, accountId, budgetedExpense, variato
   sqldf(
     sprintf(
       "
-      INSERT INTO TB_Account_Expense_Structure(PeriodID, AccountID, BudgetedOverheadExpense, Variator)
+      INSERT INTO TB_Operating_Expense(PeriodID, AccountID, BudgetedExpense, Variator)
       VALUES (%s, %s, %s, %s)
       ON CONFLICT (PeriodID, AccountID) DO NOTHING;
       ",
@@ -361,8 +361,8 @@ updateExpenseStructure <- function(periodId, accountId, actualExpense) {
   sqldf(
     sprintf(
       "
-      UPDATE TB_Account_Expense_Structure
-      SET ActualOverheadExpense = %s
+      UPDATE TB_Operating_Expense
+      SET ActualExpense = %s
       WHERE PeriodID = %s AND AccountID = %s;
       ",
       actualExpense,
@@ -399,7 +399,7 @@ server <- function(input, output, session) {
   )
 
   # Initializing the database (only required for the first run, because of the enumerations)
-  # initializeDatabase()
+  initializeDatabase()
 
   # Loading content of main table
   output$table_main_result <- loadMainResultTable()
@@ -520,7 +520,7 @@ server <- function(input, output, session) {
           session,
           expensesInputFields$BudExp[i],
           value = getColumnOfExpenseStructure(
-            "BudgetedOverheadExpense",
+            "BudgetedExpense",
             periodId,
             expensesInputFields$Account[i]
           )
@@ -591,7 +591,7 @@ server <- function(input, output, session) {
             session,
             expensesInputFields$ActExp[i],
             value = getColumnOfExpenseStructure(
-              "ActualOverheadExpense",
+              "ActualExpense",
               periodId,
               expensesInputFields$Account[i]
             )
@@ -691,11 +691,11 @@ server <- function(input, output, session) {
     sqldf(
       sprintf(
         "
-        UPDATE TB_Quantity_Structure
+        UPDATE TB_Production_Volume
         SET ActualVolume = ROUND(BudgetedVolume * %s)
         WHERE PeriodID = %s;
-        UPDATE TB_Account_Expense_Structure
-        SET ActualOverheadExpense = BudgetedOverheadExpense * %s
+        UPDATE TB_Operating_Expense
+        SET ActualExpense = BudgetedExpense * %s
         WHERE PeriodID = %s;
         ",
         1 - as.numeric(input$naiv_vol_input),

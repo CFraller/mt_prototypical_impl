@@ -8,8 +8,8 @@ CREATE TYPE UnitEnum AS ENUM ('PC', 'KG', 'L');
 CREATE TABLE IF NOT EXISTS TB_General_Ledger_Account(
     AccountID INTEGER NOT NULL,
 	AccountType AccountEnum NOT NULL,
-	BookingMatrixNumber INTEGER NOT NULL,
     AccountName VARCHAR(100) NOT NULL,
+	BookingMatrixNumber INTEGER NOT NULL,
     ResourceType ResourceEnum,
 	CostType BOOLEAN,
     PRIMARY KEY (AccountID)
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS TB_Activity(
     PRIMARY KEY (ActivityID)
 );
 
-CREATE TABLE IF NOT EXISTS TB_Routing_Position(
+CREATE TABLE IF NOT EXISTS TB_Routing(
     FinishedGoodID INTEGER NOT NULL,
 	ActivityID INTEGER NOT NULL,
 	ActivityCostDriverQuantity NUMERIC(16,8) NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS TB_Routing_Position(
     PRIMARY KEY (FinishedGoodID, ActivityID)
 );
 
-CREATE TABLE IF NOT EXISTS TB_Resource_Cost_Driver_Rate(
+CREATE TABLE IF NOT EXISTS TB_Resource_Cost_Driver(
     ActivityID INTEGER NOT NULL,
     ResourceType ResourceEnum NOT NULL,
 	Rate NUMERIC(16,8),  -- Calculate ex ante
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS TB_Material(
     PRIMARY KEY (MaterialID)
 );
 
-CREATE TABLE IF NOT EXISTS TB_Bill_Of_Material_Position(
+CREATE TABLE IF NOT EXISTS TB_Bill_Of_Material(
     FinishedGoodID INTEGER NOT NULL,
 	MaterialID INTEGER NOT NULL,
 	Quantity NUMERIC(16,8) NOT NULL,
@@ -78,12 +78,12 @@ CREATE TABLE IF NOT EXISTS TB_Planning_Period(
     PRIMARY KEY (PeriodID)
 );
 
-CREATE TABLE IF NOT EXISTS TB_Account_Expense_Structure(
+CREATE TABLE IF NOT EXISTS TB_Operating_Expense(
     PeriodID INTEGER NOT NULL,
 	AccountID INTEGER NOT NULL,
-	BudgetedOverheadExpense NUMERIC(16,8) NOT NULL,
+	BudgetedExpense NUMERIC(16,8) NOT NULL,
 	Variator NUMERIC(16,8) NOT NULL,
-	ActualOverheadExpense NUMERIC(16,8),
+	ActualExpense NUMERIC(16,8),
 	FOREIGN KEY (PeriodID) REFERENCES TB_Planning_Period(PeriodID),
 	FOREIGN KEY (AccountID) REFERENCES TB_General_Ledger_Account(AccountID),
     PRIMARY KEY (PeriodID, AccountID)
@@ -93,13 +93,13 @@ CREATE TABLE TB_Resource_Expense_Structure(
 	PeriodID INTEGER NOT NULL,
 	ResourceType ResourceEnum NOT NULL,
 	Variator NUMERIC(16,8) NOT NULL,
-	BudgetedOverheadExpenseResource NUMERIC(16,8) NOT NULL, -- Calculate ex ante
-	ActualOverheadExpenseResource NUMERIC(16,8), -- Calculate ex post
+	BudgetedResourceExpense NUMERIC(16,8) NOT NULL, -- Calculate ex ante
+	ActualResourceExpense NUMERIC(16,8), -- Calculate ex post
 	FOREIGN KEY (PeriodID) REFERENCES TB_Planning_Period(PeriodID),
 	PRIMARY KEY (PeriodID, ResourceType)
 );
 
-CREATE TABLE IF NOT EXISTS TB_Quantity_Structure(
+CREATE TABLE IF NOT EXISTS TB_Production_Volume(
     PeriodID INTEGER NOT NULL,
 	FinishedGoodID INTEGER NOT NULL,
 	CapacityVolume NUMERIC(16,8) NOT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE IF NOT EXISTS TB_Quantity_Structure(
     PRIMARY KEY (PeriodID, FinishedGoodID)
 );
 
-CREATE TABLE IF NOT EXISTS TB_Activity_Level_Structure(
+CREATE TABLE IF NOT EXISTS TB_Activity_Level(
     PeriodID INTEGER NOT NULL,
 	FinishedGoodID INTEGER NOT NULL,
 	ActivityID INTEGER NOT NULL,
@@ -123,26 +123,26 @@ CREATE TABLE IF NOT EXISTS TB_Activity_Level_Structure(
     PRIMARY KEY (PeriodID, FinishedGoodID, ActivityID)
 );
 
-CREATE TABLE IF NOT EXISTS TB_Cost_Pool_Position(
+CREATE TABLE IF NOT EXISTS TB_Cost_Pool(
     PeriodID INTEGER NOT NULL,
 	ActivityID INTEGER NOT NULL,
 	ResourceType ResourceEnum NOT NULL,
-	BudgetedOverheadExpenseResourceActivity NUMERIC(16,8) NOT NULL, -- Calculate ex ante
+	BudgetedCostPoolExpense NUMERIC(16,8) NOT NULL, -- Calculate ex ante
 	Variator NUMERIC(16,8) NOT NULL, -- Calculate ex ante
-	ActualOverheadExpenseResourceActivity NUMERIC(16,8), -- Calculate ex post
+	ActualCostPoolExpense NUMERIC(16,8), -- Calculate ex post
 	FOREIGN KEY (PeriodID) REFERENCES TB_Planning_Period(PeriodID),
 	FOREIGN KEY (ActivityID) REFERENCES TB_Activity(ActivityID),
     PRIMARY KEY (PeriodID, ActivityID, ResourceType)
 );
 
-CREATE TABLE IF NOT EXISTS TB_Activity_Pool_Position(
+CREATE TABLE IF NOT EXISTS TB_Activity_Pool(
     PeriodID INTEGER NOT NULL,
 	ActivityID INTEGER NOT NULL,
-	BudgetedOverheadExpenseActivity NUMERIC(16,8) NOT NULL, -- Calculate ex ante
+	BudgetedActivityExpense NUMERIC(16,8) NOT NULL, -- Calculate ex ante
 	Variator NUMERIC(16,8) NOT NULL, -- Calculate ex ante
 	CommittedExpense NUMERIC(16,8), -- Calculate ex ante
 	FlexibleExpense NUMERIC(16,8), -- Calculate ex ante
-	ActualOverheadExpenseActivity NUMERIC(16,8), -- Calculate ex post
+	ActualActivityExpense NUMERIC(16,8), -- Calculate ex post
 	CapacityActivityLevel NUMERIC(16,8), -- Calculate ex ante
 	BudgetedActivityLevel NUMERIC(16,8), -- Calculate ex ante
 	ActualActivityLevel NUMERIC(16,8), -- Calculate ex post
