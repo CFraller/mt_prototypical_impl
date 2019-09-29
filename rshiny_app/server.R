@@ -27,14 +27,14 @@ loadMainResultTable <- function() {
     selection = "single",
     options = list(scrollY = "200", pageLength = 10),
     colnames = c(
-      "Period ID",
-      "Actual volume of Slot Car X1",
-      "Actual volume of Slot Car Z2",
-      "Material expense of Slot Car X1",
-      "Material expense of Slot Car Z2",
-      "Overhead expense char. to Slot Car X1",
-      "Overhead expense char. to Slot Car Z2",
-      "Total overhead expense char. to prod.",
+      "Planning period ID",
+      "Act. vol. of Slot Car X1",
+      "Act. vol. of Slot Car Z2",
+      "Mat. exp. of Slot Car X1",
+      "Mat. exp. of Slot Car Z2",
+      "Overhead exp. char. to Slot Car X1",
+      "Overhead exp. char. to Slot Car Z2",
+      "Overhead expense charged to products",
       "Committed expense",
       "Flexible expense",
       "Budgeted unused capacity",
@@ -65,7 +65,7 @@ getDataOfSelectedRow <- function(selectedRow) {
   data <-
     sqldf(paste(readLines("./sql_scripts/query_results.sql"),
                 collapse = "\n"))
-  return(data[selectedRow,])
+  return(data[selectedRow, ])
 }
 
 # Loading data of the cost pool table of selected period from database
@@ -94,8 +94,8 @@ loadCostPoolTable <- function(periodId) {
       "Activity ID",
       "Resource type",
       "Variator",
-      "Budgeted overhead expense",
-      "Actual overhead expense"
+      "Bud. cost pool expense",
+      "Act. cost pool expense"
     )
   ) %>%
     formatRound(columns = "variator", digits = 2) %>%
@@ -139,9 +139,9 @@ loadActivityPoolTable <- function(periodId) {
       "Flexible expense",
       "Cap. driver rate",
       "Bud. driver rate",
-      "Unused capacity",
+      "Bud. unused capacity",
       "Capacity utilization variance",
-      "Expense char. to prod.",
+      "Expense charged to products",
       "Spending variance",
       "Flexible budget"
     )
@@ -647,7 +647,7 @@ server <- function(input, output, session) {
         "
     )
     periodId <-
-      sqldf("SELECT MAX(PeriodID) FROM TB_Planning_Period;")[1,]
+      sqldf("SELECT MAX(PeriodID) FROM TB_Planning_Period;")[1, ]
     sqldf(
       sprintf(
         "
@@ -670,7 +670,7 @@ server <- function(input, output, session) {
       "select_period",
       "Select planning period",
       choices = periods,
-      selected = ifelse(nrow(periods) > 0, periods[nrow(periods),], 0)
+      selected = ifelse(nrow(periods) > 0, periods[nrow(periods), ], 0)
     )
   })
   
@@ -694,7 +694,7 @@ server <- function(input, output, session) {
         "
     )
     periodId <-
-      sqldf("SELECT MAX(PeriodID) FROM TB_Planning_Period;")[1,]
+      sqldf("SELECT MAX(PeriodID) FROM TB_Planning_Period;")[1, ]
     sqldf(
       sprintf(
         "
@@ -723,9 +723,9 @@ server <- function(input, output, session) {
         SET ActualExpense = BudgetedExpense * %s
         WHERE PeriodID = %s;
         ",
-        1 - as.numeric(input$naiv_vol_input),
+        1 - (as.numeric(input$naiv_vol_input) / 100),
         periodId,
-        1 - as.numeric(input$naiv_exp_input),
+        1 - (as.numeric(input$naiv_exp_input) / 100),
         periodId
       )
     )
@@ -741,7 +741,7 @@ server <- function(input, output, session) {
       "select_period",
       "Select planning period",
       choices = periods,
-      selected = ifelse(nrow(periods) > 0, periods[nrow(periods),], 0)
+      selected = ifelse(nrow(periods) > 0, periods[nrow(periods), ], 0)
     )
     output$table_main_result <- loadMainResultTable()
     output$table_cost_pool <- DT::renderDT(datatable(NULL))

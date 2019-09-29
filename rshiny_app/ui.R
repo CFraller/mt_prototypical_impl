@@ -26,7 +26,7 @@ ui <- fluidPage(
         fluidRow(
           div(style = "height:20px;"),
           h4(
-            "Option 1: Add a new planning period using data from naive callibration"
+            "Option 1: Add an estimate for a new planning period by naive calibration (naive callibr.) based on the historical values of the previous planning period"
           )
         ),
         fluidRow(
@@ -35,30 +35,32 @@ ui <- fluidPage(
             2,
             actionButton(
               "new_naiveperiod_button",
-              "Add new period (naive callibr.)",
+              "Add estimate (naive callibr.)",
               width = "80%",
               style = "padding:12px; margin-top:20px;"
             )
           ),
           column(
             2,
-            textInput("naiv_vol_input", "Reduction of actual volume", width = "80%")
+            textInput("naiv_vol_input", "Reduction of actual volume [%]", width = "80%")
           ),
           column(
             2,
-            textInput("naiv_exp_input", "Reduction of actual expenses", width = "80%")
+            textInput("naiv_exp_input", "Reduction of actual expenses [%]", width = "80%")
           )
         ),
         fluidRow(
           div(style = "height:20px;"),
-          h4("Option 2: Add a new planning period using data from user input")
+          h4(
+            "Option 2: Add an estimate for a new planning period by an expert estimation (expert est.) without considering historical data of previous planning periods"
+          )
         ),
         fluidRow(
           column(
             2,
             actionButton(
               "new_period_button",
-              "Add new period (user input)",
+              "Add estimate (expert est.)",
               width = "80%",
               style = "padding:12px; margin-top:20px;"
             )
@@ -93,101 +95,101 @@ ui <- fluidPage(
           ),
           column(
             2,
-            textInput("cap_vol_input_x1", "Cap. volume of Slot Car X1", width = "80%")
+            textInput("cap_vol_input_x1", "Cap. vol. of Slot Car X1 [pcs.]", width = "80%")
           ),
           column(
             2,
-            textInput("699_bud_input", "Bud. exp. of '699 Disc. Personnel'", width = "80%")
+            textInput("699_bud_input", "Bud. exp. of '699 Pers.' [$]", width = "80%")
           ),
           column(
             2,
-            textInput("699_var_input", "Variator of '699 Disc. Personnel'", width = "80%")
+            textInput("699_var_input", "Variator of '699 Pers.' [0-1]", width = "80%")
           ),
           column(
             2,
-            textInput("act_vol_input_x1", "Act. vol. of Slot Car X1", width = "80%")
+            textInput("act_vol_input_x1", "Act. vol. of Slot Car X1 [pcs.]", width = "80%")
           ),
           column(
             2,
-            textInput("699_act_input", "Act. exp. of '699 Dis. Personnel'", width = "80%")
+            textInput("699_act_input", "Act. exp. of '699 Pers.' [$]", width = "80%")
           )
         ),
         fluidRow(
           column(
             2,
-            textInput("bud_vol_input_x1", "Bud. volume of Slot Car X1", width = "80%"),
+            textInput("bud_vol_input_x1", "Bud. vol. of Slot Car X1 [pcs.]", width = "80%"),
             offset = 2
           ),
           column(
             2,
-            textInput("700_bud_input", "Bud. exp. of '700 Depreciation'", width = "80%")
+            textInput("700_bud_input", "Bud. exp. of '700 Depr.' [$]", width = "80%")
           ),
           column(
             2,
-            textInput("700_var_input", "Variator of '700 Depreciation'", width = "80%")
+            textInput("700_var_input", "Variator of '700 Depr.' [0-1]", width = "80%")
           ),
           column(
             2,
-            textInput("act_vol_input_z2", "Act. vol. of Slot Car Z2", width = "80%")
+            textInput("act_vol_input_z2", "Act. vol. of Slot Car Z2 [pcs.]", width = "80%")
           ),
           column(
             2,
-            textInput("700_act_input", "Act. exp. of '700 Depreciation'", width = "80%")
+            textInput("700_act_input", "Act. exp. of '700 Depr.' [$]", width = "80%")
           )
         ),
         fluidRow(
           column(
             2,
-            textInput("cap_vol_input_z2", "Cap. volume of Slot Car Z2", width = "80%"),
+            textInput("cap_vol_input_z2", "Cap. vol. of Slot Car Z2 [pcs.]", width = "80%"),
             offset = 2
           ),
           column(
             2,
-            textInput("709_bud_input", "Bud. exp. of '709 Operating exp.'", width = "80%")
+            textInput("709_bud_input", "Bud. exp. of '709 Oper.' [$]", width = "80%")
           ),
           column(
             2,
-            textInput("709_var_input", "Variator of '709 Operating exp.'", width = "80%")
+            textInput("709_var_input", "Variator of '709 Oper.' [0-1]", width = "80%")
           ),
           column(
             2,
-            textInput("709_act_input", "Act. exp. of '709 Operating exp.'", width = "80%"),
-            offset = 2
-          )
-        ),
-        fluidRow(
-          column(
-            2,
-            textInput("bud_vol_input_z2", "Bud. volume of Slot Car Z2", width = "80%"),
-            offset = 2
-          ),
-          column(
-            2,
-            textInput("720_bud_input", "Bud. exp. of '720 Maint. costs'", width = "80%")
-          ),
-          column(
-            2,
-            textInput("720_var_input", "Variator of '720 Maint. costs'", width = "80%")
-          ),
-          column(
-            2,
-            textInput("720_act_input", "Act. exp. of '720 Maint. costs'", width = "80%"),
+            textInput("709_act_input", "Act. exp. of '709 Oper.' [$]", width = "80%"),
             offset = 2
           )
         ),
         fluidRow(
           column(
             2,
-            textInput("798_bud_input", "Bud. exp. of '798 Admin. exp.'", width = "80%"),
+            textInput("bud_vol_input_z2", "Bud. vol. of Slot Car Z2 [pcs.]", width = "80%"),
+            offset = 2
+          ),
+          column(
+            2,
+            textInput("720_bud_input", "Bud. exp. of '720 Main.' [$]", width = "80%")
+          ),
+          column(
+            2,
+            textInput("720_var_input", "Variator of '720 Main.' [0-1]", width = "80%")
+          ),
+          column(
+            2,
+            textInput("720_act_input", "Act. exp. of '720 Main.' [$]", width = "80%"),
+            offset = 2
+          )
+        ),
+        fluidRow(
+          column(
+            2,
+            textInput("798_bud_input", "Bud. exp. of '798 Admi.' [$]", width = "80%"),
             offset = 4
           ),
           column(
             2,
-            textInput("798_var_input", "Variator of '798 Admin. exp.'", width = "80%")
+            textInput("798_var_input", "Variator of '798 Admi.' [0-1]", width = "80%")
           ),
           column(
             2,
-            textInput("798_act_input", "Act. exp. of '798 Admin. exp.'", width = "80%"),
+            textInput("798_act_input", "Act. exp. of '798 Admi.' [$]", width = "80%"),
             offset = 2
           )
         ),
@@ -243,7 +245,10 @@ ui <- fluidPage(
           offset = 1
         )),
         fluidRow(div(style = "height:10px;"), column(
-          8, h4("Table 1: Results of flexible budgeting grouped by periods")
+          8,
+          h4(
+            "Table 1: Aggregated results of flexible budgeting grouped by planning periods"
+          )
         )),
         fluidRow(DT::dataTableOutput("table_main_result")),
         fluidRow(div(style = "height:10px;"),
