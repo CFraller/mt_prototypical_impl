@@ -12,8 +12,8 @@ SELECT
 	SUM(FlexibleExpense) AS FlexibleExpense, 
 	SUM(UnusedCapacity) AS UnusedCapacity, 
 	SUM(CapacityUtilizationVariance) AS CapacityUtilizationVariance, 
-	SUM(SpendingVariance) AS SpendingVariance, 
-	SUM(FlexibleBudget) AS FlexibleBudget
+	SUM(FlexibleBudget) AS FlexibleBudget,
+	SUM(SpendingVariance) AS SpendingVariance
 FROM 
 	TB_Activity_Pool
 JOIN

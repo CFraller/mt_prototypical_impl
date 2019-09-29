@@ -1,8 +1,12 @@
 -- Create enumerations
-CREATE TYPE AccountEnum AS ENUM ('Asset', 'Liability', 'Revenue', 'Expense', 'Equity');
-CREATE TYPE ResourceEnum AS ENUM ('MAT', 'PERS', 'TECH', 'MISC');
-CREATE TYPE MaterialEnum AS ENUM ('FG', 'RMA', 'RMB');
-CREATE TYPE UnitEnum AS ENUM ('PC', 'KG', 'L');
+DO $$ BEGIN
+    CREATE TYPE AccountEnum AS ENUM ('Asset', 'Liability', 'Revenue', 'Expense', 'Equity');
+	CREATE TYPE ResourceEnum AS ENUM ('MAT', 'PERS', 'TECH', 'MISC');
+	CREATE TYPE MaterialEnum AS ENUM ('FG', 'RMA', 'RMB');
+	CREATE TYPE UnitEnum AS ENUM ('PC', 'KG', 'L');
+EXCEPTION
+    WHEN DUPLICATE_OBJECT THEN NULL;
+END $$;
 
 -- Create master data tables
 CREATE TABLE IF NOT EXISTS TB_General_Ledger_Account(
@@ -89,7 +93,7 @@ CREATE TABLE IF NOT EXISTS TB_Operating_Expense(
     PRIMARY KEY (PeriodID, AccountID)
 );
 
-CREATE TABLE TB_Resource_Expense_Structure(
+CREATE TABLE IF NOT EXISTS TB_Resource_Expense_Structure(
 	PeriodID INTEGER NOT NULL,
 	ResourceType ResourceEnum NOT NULL,
 	Variator NUMERIC(16,8) NOT NULL,

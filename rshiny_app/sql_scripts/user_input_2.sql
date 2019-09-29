@@ -1,6 +1,6 @@
--- Update resource expense structure with ActuaResourceExpense
+-- Update resource expense structure with ActualResourceExpense 
 UPDATE TB_Resource_Expense_Structure
-	SET ActualResourceExpense = temp.ActuaResourceExpense
+	SET ActualResourceExpense = temp.ActualResourceExpense 
 	FROM (SELECT TB_Operating_Expense.PeriodID, TB_General_Ledger_Account.ResourceType, 
 			SUM(TB_Operating_Expense.ActualExpense) AS ActualResourceExpense 
 		  FROM TB_General_Ledger_Account
@@ -10,11 +10,11 @@ UPDATE TB_Resource_Expense_Structure
  	WHERE TB_Resource_Expense_Structure.PeriodID = temp.PeriodID 
 	AND TB_Resource_Expense_Structure.ResourceType = temp.ResourceType;
 
--- Update cost pool position data with ActuaCostPoolExpense
+-- Update cost pool position data with ActualCostPoolExpense
 UPDATE TB_Cost_Pool
-	SET ActuaCostPoolExpense = temp.ActuaCostPoolExpense
+	SET ActualCostPoolExpense = temp.ActualCostPoolExpense
 	FROM (SELECT PeriodID, ActivityID, TB_Resource_Cost_Driver.ResourceType,
-			SUM(Rate*ActuaResourceExpense) AS ActuaCostPoolExpense,
+			SUM(Rate*ActualResourceExpense ) AS ActualCostPoolExpense,
 			Variator
 		  FROM TB_Resource_Cost_Driver
 			JOIN TB_Resource_Expense_Structure
@@ -25,22 +25,22 @@ UPDATE TB_Cost_Pool
 	AND TB_Cost_Pool.ResourceType = temp.ResourceType;
 
 -- Update activity level structure data with ActualActivityLevel
-UPDATE TB_Activity_Level_Structure
+UPDATE TB_Activity_Level
 	SET ActualActivityLevel = temp.ActualActivityLevel
 	FROM (SELECT PeriodID, TB_Production_Volume.FinishedGoodID, ActivityID, 
 			ActualVolume*ActivityCostDriverQuantity AS ActualActivityLevel
 		  FROM TB_Production_Volume
 			JOIN TB_Routing
 				ON TB_Production_Volume.FinishedGoodID = TB_Routing.FinishedGoodID) AS temp
-	WHERE TB_Activity_Level_Structure.PeriodID = temp.PeriodID 
-	AND TB_Activity_Level_Structure.FinishedGoodID = temp.FinishedGoodID 
-	AND TB_Activity_Level_Structure.ActivityID = temp.ActivityID;
+	WHERE TB_Activity_Level.PeriodID = temp.PeriodID 
+	AND TB_Activity_Level.FinishedGoodID = temp.FinishedGoodID 
+	AND TB_Activity_Level.ActivityID = temp.ActivityID;
 
 -- Update activity pool position with ActualActivityExpense
 UPDATE TB_Activity_Pool
 	SET ActualActivityExpense = temp.ActualActivityExpense
 	FROM (SELECT TB_Cost_Pool.PeriodID, TB_Cost_Pool.ActivityID, 
-			SUM(ActuaCostPoolExpense) AS ActualActivityExpense
+			SUM(ActualCostPoolExpense) AS ActualActivityExpense
 		  FROM TB_Cost_Pool
 		  GROUP BY TB_Cost_Pool.PeriodID, TB_Cost_Pool.ActivityID) AS temp
 	WHERE TB_Activity_Pool.PeriodID = temp.PeriodID 
@@ -50,7 +50,7 @@ UPDATE TB_Activity_Pool
 UPDATE TB_Activity_Pool
 	SET ActualActivityLevel = temp.ActualActivityLevel 
 	FROM (SELECT PeriodID, ActivityID, SUM(ActualActivityLevel) AS ActualActivityLevel
-			FROM TB_Activity_Level_Structure
+			FROM TB_Activity_Level
 			GROUP BY PeriodID, ActivityID) AS temp
 	WHERE TB_Activity_Pool.ActivityID = temp.ActivityID AND TB_Activity_Pool.PeriodID = temp.PeriodID;
 	

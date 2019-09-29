@@ -7,17 +7,21 @@ require("DT")
 
 # Initializing PostgreSQL database
 initializeDatabase <- function() {
-  sqldf(paste(readLines("./sql_scripts/initialize_create_tables.sql"), collapse = "\n"))
-  sqldf(paste(readLines("./sql_scripts/initialize_insert_data.sql"), collapse = "\n"))
+  sqldf(paste(
+    readLines("./sql_scripts/initialize_create_tables.sql"),
+    collapse = "\n"
+  ))
+  sqldf(paste(
+    readLines("./sql_scripts/initialize_insert_data.sql"),
+    collapse = "\n"
+  ))
 }
 
 # Loading data of the main results table from database
 loadMainResultTable <- function() {
   data <-
-    sqldf(paste(
-      readLines("./sql_scripts/query_results.sql"),
-      collapse = "\n"
-    ))
+    sqldf(paste(readLines("./sql_scripts/query_results.sql"),
+                collapse = "\n"))
   dt <- datatable(
     data.frame(data),
     selection = "single",
@@ -33,10 +37,10 @@ loadMainResultTable <- function() {
       "Total overhead expense char. to prod.",
       "Committed expense",
       "Flexible expense",
-      "Unused capacity",
+      "Budgeted unused capacity",
       "Capacity utilization variance",
-      "Spending variance",
-      "Flexible budget"
+      "Flexible budget",
+      "Spending variance"
     )
   ) %>%
     formatRound(columns = "volumeproduct1", digits = 2) %>%
@@ -50,8 +54,8 @@ loadMainResultTable <- function() {
     formatCurrency(columns = "flexibleexpense") %>%
     formatCurrency(columns = "unusedcapacity") %>%
     formatCurrency(columns = "capacityutilizationvariance") %>%
-    formatCurrency(columns = "spendingvariance") %>%
-    formatCurrency(columns = "flexiblebudget")
+    formatCurrency(columns = "flexiblebudget") %>%
+    formatCurrency(columns = "spendingvariance")
   tabl <- DT::renderDT(dt)
   return(tabl)
 }
@@ -59,26 +63,29 @@ loadMainResultTable <- function() {
 # Get the data of selected row of the main results table
 getDataOfSelectedRow <- function(selectedRow) {
   data <-
-    sqldf(paste(
-      readLines("./sql_scripts/query_results.sql"),
-      collapse = "\n"
-    ))
-  return(data[selectedRow, ])
+    sqldf(paste(readLines("./sql_scripts/query_results.sql"),
+                collapse = "\n"))
+  return(data[selectedRow,])
 }
 
 # Loading data of the cost pool table of selected period from database
 loadCostPoolTable <- function(periodId) {
-  data <- sqldf(sprintf("
+  data <- sqldf(
+    sprintf(
+      "
                 SELECT
-                ActivityID, 
-                ResourceType, 
-                Variator, 
-                BudgetedCostPoolExpense, 
-                ActualCostPoolExpense 
-                FROM 
+                ActivityID,
+                ResourceType,
+                Variator,
+                BudgetedCostPoolExpense,
+                ActualCostPoolExpense
+                FROM
                 TB_Cost_Pool
                 WHERE PeriodID = %s
-                ORDER BY ActivityID;", periodId))
+                ORDER BY ActivityID;",
+      periodId
+    )
+  )
   dt <- datatable(
     data.frame(data),
     selection = "single",
@@ -100,23 +107,28 @@ loadCostPoolTable <- function(periodId) {
 
 # Loading data of the activity pool table of selected period from database
 loadActivityPoolTable <- function(periodId) {
-  data <- sqldf(sprintf("
-                         SELECT 
+  data <- sqldf(
+    sprintf(
+      "
+                         SELECT
 	                       ActivityID,
                          CommittedExpense,
-                         FlexibleExpense, 
+                         FlexibleExpense,
                          CapacityDriverRate,
                          BudgetedDriverRate,
                          UnusedCapacity,
                          CapacityUtilizationVariance,
                          ExpenseChargedToProducts,
-                         SpendingVariance, 
+                         SpendingVariance,
                          FlexibleBudget
-                         FROM 
+                         FROM
                          TB_Activity_Pool
                          WHERE PeriodID = %s
                          ORDER BY ActivityID;
-                         ", periodId))
+                         ",
+      periodId
+    )
+  )
   dt <- datatable(
     data.frame(data),
     selection = "single",
@@ -171,10 +183,8 @@ loadChartOfAccountsTable <- function() {
   dt <- datatable(
     data.frame(data),
     selection = "single",
-    options = list(
-      scrollY = "600",
-      pageLength = 25
-    ),
+    options = list(scrollY = "600",
+                   pageLength = 25),
     colnames = c(
       "G/L account ID",
       "Account type",
@@ -259,10 +269,8 @@ loadRouting <- function() {
 
 # Loading data of an arbitrary table from database
 loadDatabaseTable <- function(tableName) {
-  data <- sqldf(sprintf(
-    "SELECT * FROM %s;",
-    tableName
-  ))
+  data <- sqldf(sprintf("SELECT * FROM %s;",
+                        tableName))
   dt <- datatable(
     data.frame(data),
     selection = "single",
@@ -273,108 +281,119 @@ loadDatabaseTable <- function(tableName) {
 }
 
 # Get selected column of a quantity structure from particular planning period and finished good
-getColumnOfQuantityStructure <- function(column, periodId, finishedGoodId) {
-  value <- sqldf(
-    sprintf(
-      "
+getColumnOfQuantityStructure <-
+  function(column, periodId, finishedGoodId) {
+    value <- sqldf(
+      sprintf(
+        "
       SELECT %s
       FROM TB_Production_Volume
       WHERE PeriodID = %s AND FinishedGoodID = %s;
       ",
-      column,
-      periodId,
-      finishedGoodId
+        column,
+        periodId,
+        finishedGoodId
+      )
     )
-  )
-  return(value[, 1])
-}
+    return(value[, 1])
+  }
 
 # Get selected column of a expense structure from particular planning period and account
-getColumnOfExpenseStructure <- function(column, periodId, accountId) {
-  value <- sqldf(
-    sprintf(
-      "
+getColumnOfExpenseStructure <-
+  function(column, periodId, accountId) {
+    value <- sqldf(
+      sprintf(
+        "
       SELECT %s
       FROM TB_Operating_Expense
       WHERE PeriodID = %s AND AccountID = %s;
       ",
-      column,
-      periodId,
-      accountId
+        column,
+        periodId,
+        accountId
+      )
     )
-  )
-  return(value[, 1])
-}
+    return(value[, 1])
+  }
 
 # Insert a new quantity structure to a planning period
-insertQuantityStructure <- function(periodId, finishedGoodId, capacityVolume, budgetedVolume) {
-  sqldf(
-    sprintf(
-      "
+insertQuantityStructure <-
+  function(periodId,
+           finishedGoodId,
+           capacityVolume,
+           budgetedVolume) {
+    sqldf(
+      sprintf(
+        "
         INSERT INTO TB_Production_Volume(PeriodID, FinishedGoodID, CapacityVolume, BudgetedVolume)
         VALUES (%s, %s, %s, %s)
         ON CONFLICT (PeriodID, FinishedGoodID) DO NOTHING;
         ",
-      periodId,
-      finishedGoodId,
-      capacityVolume,
-      budgetedVolume
+        periodId,
+        finishedGoodId,
+        capacityVolume,
+        budgetedVolume
+      )
     )
-  )
-}
+  }
 
 # Update a quantity structure of a particular planning period
-updateQuantityStructure <- function(periodId, finishedGoodId, actualVolume) {
-  sqldf(
-    sprintf(
-      "
+updateQuantityStructure <-
+  function(periodId, finishedGoodId, actualVolume) {
+    sqldf(
+      sprintf(
+        "
       UPDATE TB_Production_Volume
       SET ActualVolume = %s
       WHERE PeriodID = %s AND FinishedGoodID = %s;
       ",
-      actualVolume,
-      periodId,
-      finishedGoodId
+        actualVolume,
+        periodId,
+        finishedGoodId
+      )
     )
-  )
-}
+  }
 
 # Insert a new expense structure to a planning period
-insertExpenseStructure <- function(periodId, accountId, budgetedExpense, variator) {
-  sqldf(
-    sprintf(
-      "
+insertExpenseStructure <-
+  function(periodId,
+           accountId,
+           budgetedExpense,
+           variator) {
+    sqldf(
+      sprintf(
+        "
       INSERT INTO TB_Operating_Expense(PeriodID, AccountID, BudgetedExpense, Variator)
       VALUES (%s, %s, %s, %s)
       ON CONFLICT (PeriodID, AccountID) DO NOTHING;
       ",
-      periodId,
-      accountId,
-      budgetedExpense,
-      variator
+        periodId,
+        accountId,
+        budgetedExpense,
+        variator
+      )
     )
-  )
-}
+  }
 
 # Update an expense structure of a particular planning period
-updateExpenseStructure <- function(periodId, accountId, actualExpense) {
-  sqldf(
-    sprintf(
-      "
+updateExpenseStructure <-
+  function(periodId, accountId, actualExpense) {
+    sqldf(
+      sprintf(
+        "
       UPDATE TB_Operating_Expense
       SET ActualExpense = %s
       WHERE PeriodID = %s AND AccountID = %s;
       ",
-      actualExpense,
-      periodId,
-      accountId
+        actualExpense,
+        periodId,
+        accountId
+      )
     )
-  )
-}
+  }
 
 # Load server application
 server <- function(input, output, session) {
-
   # Establish connection to PoststgreSQL using RPostgreSQL
   username <- "postgres"
   password <- ""
@@ -397,57 +416,61 @@ server <- function(input, output, session) {
     sqldf.RPostgreSQL.host = ipaddress,
     sqldf.RPostgreSQL.port = portnumber
   )
-
+  
   # Initializing the database (only required for the first run, because of the enumerations)
   initializeDatabase()
-
+  
   # Loading content of main table
   output$table_main_result <- loadMainResultTable()
-
+  
   # Initialize an empty table into cost pool table
   output$table_cost_pool <- DT::renderDT(datatable(NULL))
-
+  
   # Initialize an empty table into activity pool table
   output$table_activity_pool <- DT::renderDT(datatable(NULL))
-
+  
   # Loading content of chart of accounts
   output$table_chart_of_accounts <- loadChartOfAccountsTable()
-
+  
   # Loading content of bill of materials
   output$table_bill_of_materials <- loadBillOfMaterialTable()
-
+  
   # Loading content of routing
   output$table_rounting <- loadRouting()
-
+  
   # Displaying the TU Wien logo
   output$img_tuwien_logo <- renderUI({
     tags$img(src = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/TU_Wien-Logo.svg/200px-TU_Wien-Logo.svg.png")
   })
-
+  
   # Displaying the "txt_about" - statement
   output$txt_about <- renderText({
-    readLines(textConnection("This R Shiny application, concerning flexible budgeting, is part of the prototypical implementation of a master thesis conducted at the Vienna University of Technology.
-                             The underlying concepts rest on the capacity-based ABC approach with committed and flexible resources introduced by Kaplan (1994). \u00A9 Christoph Fraller, 01425649", encoding = "UTF-8"), encoding = "UTF-8")
+    readLines(
+      textConnection(
+        "This R Shiny application, concerning flexible budgeting, is part of the prototypical implementation of a master thesis conducted at the Vienna University of Technology.
+                             The underlying concepts rest on the capacity-based ABC approach with committed and flexible resources introduced by Kaplan (1994). \u00A9 Christoph Fraller, 01425649",
+        encoding = "UTF-8"
+      ),
+      encoding = "UTF-8"
+    )
   })
-
+  
   periods <- sqldf("SELECT PeriodID FROM TB_Planning_Period;")
   if (nrow(periods) <= 1) {
     periods <- 0
   }
-  updateSelectInput(
-    session,
-    "select_period",
-    choices = periods,
-    selected = 0
-  )
-
+  updateSelectInput(session,
+                    "select_period",
+                    choices = periods,
+                    selected = 0)
+  
   volumesInputFields <- data.frame(
     FinishedGood = c(120, 140),
     CapVol = c("cap_vol_input_x1", "cap_vol_input_z2"),
     BudVol = c("bud_vol_input_x1", "bud_vol_input_z2"),
     ActVol = c("act_vol_input_x1", "act_vol_input_z2")
   )
-
+  
   expensesInputFields <- data.frame(
     Account = c(699, 700, 709, 720, 798),
     BudExp = c(
@@ -472,7 +495,7 @@ server <- function(input, output, session) {
       "798_act_input"
     )
   )
-
+  
   # Selecting planning period event
   observeEvent(input$select_period, {
     periodId <- input$select_period
@@ -528,14 +551,12 @@ server <- function(input, output, session) {
         updateTextInput(
           session,
           expensesInputFields$Var[i],
-          value = getColumnOfExpenseStructure(
-            "Variator",
-            periodId,
-            expensesInputFields$Account[i]
-          )
+          value = getColumnOfExpenseStructure("Variator",
+                                              periodId,
+                                              expensesInputFields$Account[i])
         )
       }
-
+      
       disable("reset_bud_par_button")
       disable("confirm_bud_par_button")
     }
@@ -546,14 +567,14 @@ server <- function(input, output, session) {
         updateTextInput(session, volumesInputFields$CapVol[i], value = "")
         updateTextInput(session, volumesInputFields$BudVol[i], value = "")
       }
-
+      
       sapply(expensesInputFields$BudExp, enable)
       sapply(expensesInputFields$Var, enable)
       for (i in 1:nrow(expensesInputFields)) {
         updateTextInput(session, expensesInputFields$BudExp[i], value = "")
         updateTextInput(session, expensesInputFields$Var[i], value = "")
       }
-
+      
       enable("reset_bud_par_button")
       enable("confirm_bud_par_button")
     }
@@ -562,12 +583,12 @@ server <- function(input, output, session) {
       for (i in 1:nrow(volumesInputFields)) {
         updateTextInput(session, volumesInputFields$ActVol[i], value = "")
       }
-
+      
       sapply(expensesInputFields$ActExp, enable)
       for (i in 1:nrow(expensesInputFields)) {
         updateTextInput(session, expensesInputFields$ActExp[i], value = "")
       }
-
+      
       enable("reset_act_par_button")
       enable("confirm_act_par_button")
     }
@@ -605,7 +626,7 @@ server <- function(input, output, session) {
         for (i in 1:nrow(volumesInputFields)) {
           updateTextInput(session, volumesInputFields$ActVol[i], value = "")
         }
-
+        
         sapply(expensesInputFields$ActExp, disable)
         for (i in 1:nrow(expensesInputFields)) {
           updateTextInput(session, expensesInputFields$ActExp[i], value = "")
@@ -615,7 +636,7 @@ server <- function(input, output, session) {
       }
     }
   })
-
+  
   # Add new period (user input) event
   observeEvent(input$new_period_button, {
     sqldf(
@@ -625,7 +646,8 @@ server <- function(input, output, session) {
         ON CONFLICT (PeriodID) DO NOTHING;
         "
     )
-    periodId <- sqldf("SELECT MAX(PeriodID) FROM TB_Planning_Period;")[1, ]
+    periodId <-
+      sqldf("SELECT MAX(PeriodID) FROM TB_Planning_Period;")[1,]
     sqldf(
       sprintf(
         "
@@ -648,18 +670,20 @@ server <- function(input, output, session) {
       "select_period",
       "Select planning period",
       choices = periods,
-      selected = ifelse(nrow(periods) > 0, periods[nrow(periods), ], 0)
+      selected = ifelse(nrow(periods) > 0, periods[nrow(periods),], 0)
     )
   })
-
+  
   # Observe input fields of volume and expense for naive callibration
   observe({
     toggleState(
       "new_naiveperiod_button",
-      (input$naiv_vol_input != "" | is.null(input$naiv_vol_input)) & (input$naiv_exp_input != "" | is.null(input$naiv_exp_input))
+      (input$naiv_vol_input != "" |
+         is.null(input$naiv_vol_input)) &
+        (input$naiv_exp_input != "" | is.null(input$naiv_exp_input))
     )
   })
-
+  
   # Add new period (naive callibration) event
   observeEvent(input$new_naiveperiod_button, {
     sqldf(
@@ -669,7 +693,8 @@ server <- function(input, output, session) {
         ON CONFLICT (PeriodID) DO NOTHING;
         "
     )
-    periodId <- sqldf("SELECT MAX(PeriodID) FROM TB_Planning_Period;")[1, ]
+    periodId <-
+      sqldf("SELECT MAX(PeriodID) FROM TB_Planning_Period;")[1,]
     sqldf(
       sprintf(
         "
@@ -716,13 +741,13 @@ server <- function(input, output, session) {
       "select_period",
       "Select planning period",
       choices = periods,
-      selected = ifelse(nrow(periods) > 0, periods[nrow(periods), ], 0)
+      selected = ifelse(nrow(periods) > 0, periods[nrow(periods),], 0)
     )
     output$table_main_result <- loadMainResultTable()
     output$table_cost_pool <- DT::renderDT(datatable(NULL))
     output$table_activity_pool <- DT::renderDT(datatable(NULL))
   })
-
+  
   # Confirm budgeted parameters event
   observeEvent(input$confirm_bud_par_button, {
     periodId <- input$select_period
@@ -742,10 +767,8 @@ server <- function(input, output, session) {
         as.numeric(input[[as.character(expensesInputFields$Var[i])]])
       )
     }
-    sqldf(paste(
-      readLines("./sql_scripts/user_input_1.sql"),
-      collapse = "\n"
-    ))
+    sqldf(paste(readLines("./sql_scripts/user_input_1.sql"),
+                collapse = "\n"))
     sqldf(
       sprintf(
         "
@@ -762,28 +785,22 @@ server <- function(input, output, session) {
     output$table_cost_pool <- DT::renderDT(datatable(NULL))
     output$table_activity_pool <- DT::renderDT(datatable(NULL))
   })
-
+  
   # Confirm actual parameters event
   observeEvent(input$confirm_act_par_button, {
     periodId <- input$select_period
     for (i in 1:nrow(volumesInputFields)) {
-      updateQuantityStructure(
-        periodId,
-        volumesInputFields$FinishedGood[i],
-        as.numeric(input[[as.character(volumesInputFields$ActVol[i])]])
-      )
+      updateQuantityStructure(periodId,
+                              volumesInputFields$FinishedGood[i],
+                              as.numeric(input[[as.character(volumesInputFields$ActVol[i])]]))
     }
     for (i in 1:nrow(expensesInputFields)) {
-      updateExpenseStructure(
-        periodId,
-        expensesInputFields$Account[i],
-        as.numeric(input[[as.character(expensesInputFields$ActExp[i])]])
-      )
+      updateExpenseStructure(periodId,
+                             expensesInputFields$Account[i],
+                             as.numeric(input[[as.character(expensesInputFields$ActExp[i])]]))
     }
-    sqldf(paste(
-      readLines("./sql_scripts/user_input_2.sql"),
-      collapse = "\n"
-    ))
+    sqldf(paste(readLines("./sql_scripts/user_input_2.sql"),
+                collapse = "\n"))
     sqldf(
       sprintf(
         "
@@ -800,7 +817,7 @@ server <- function(input, output, session) {
     output$table_cost_pool <- DT::renderDT(datatable(NULL))
     output$table_activity_pool <- DT::renderDT(datatable(NULL))
   })
-
+  
   # Reset budgeted parameters event
   observeEvent(input$reset_bud_par_button, {
     for (i in 1:nrow(volumesInputFields)) {
@@ -812,7 +829,7 @@ server <- function(input, output, session) {
       updateTextInput(session, expensesInputFields$Var[i], value = "")
     }
   })
-
+  
   # Reset actual parameters event
   observeEvent(input$reset_act_par_button, {
     for (i in 1:nrow(volumesInputFields)) {
@@ -822,12 +839,12 @@ server <- function(input, output, session) {
       updateTextInput(session, expensesInputFields$ActExp[i], value = "")
     }
   })
-
+  
   # Load database table event
   observeEvent(input$table_selector, {
     output$table_database <- loadDatabaseTable(input$table_selector)
   })
-
+  
   # Observe rows select in tab inspection of outcomes event
   observeEvent(input$table_main_result_rows_selected, {
     data <- getDataOfSelectedRow(input$table_main_result_rows_selected)
@@ -835,10 +852,13 @@ server <- function(input, output, session) {
     output$table_cost_pool <- loadCostPoolTable(periodId)
     output$table_activity_pool <- loadActivityPoolTable(periodId)
   })
-
+  
   # Reset database event
   observeEvent(input$reset_db_button, {
-    sqldf(paste(readLines("./sql_scripts/reset_drop_tables.sql"), collapse = "\n"))
+    sqldf(paste(
+      readLines("./sql_scripts/reset_drop_tables.sql"),
+      collapse = "\n"
+    ))
     initializeDatabase()
     output$table_main_result <- loadMainResultTable()
     output$table_cost_pool <- DT::renderDT(datatable(NULL))
@@ -848,12 +868,11 @@ server <- function(input, output, session) {
     output$table_rounting <- loadRouting()
     output$table_database <- loadDatabaseTable(input$table_selector)
     updateSelectInput(session,
-      "select_period",
-      selected = 0,
-      choices = 0
-    )
+                      "select_period",
+                      selected = 0,
+                      choices = 0)
   })
-
+  
   # Close PostgreSQL connection
   dbDisconnect(con)
 }

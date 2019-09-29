@@ -16,12 +16,18 @@ ui <- fluidPage(
       "Estimation of Parameters",
       value = "Estimation of Parameters",
       fluidRow(column(
-        12, titlePanel("Estimation of budgeted parameters and realization of actual parameters"),
+        12,
+        titlePanel(
+          "Estimation of budgeted parameters and realization of actual parameters"
+        ),
         offset = 3
       )),
       fluidPage(
         fluidRow(
-          div(style = "height:20px;"), h4("Option 1: Add a new planning period using data from naive callibration")
+          div(style = "height:20px;"),
+          h4(
+            "Option 1: Add a new planning period using data from naive callibration"
+          )
         ),
         fluidRow(
           div(style = "height:10px;"),
@@ -44,7 +50,8 @@ ui <- fluidPage(
           )
         ),
         fluidRow(
-          div(style = "height:20px;"), h4("Option 2: Add a new planning period using data from user input")
+          div(style = "height:20px;"),
+          h4("Option 2: Add a new planning period using data from user input")
         ),
         fluidRow(
           column(
@@ -56,8 +63,21 @@ ui <- fluidPage(
               style = "padding:12px; margin-top:20px;"
             )
           ),
-          column(6, div(style = "height:10px;"), h4("Estimation of budgeted parameters: cap. volumes, bud. volumes, bud. expenses, and variators")),
-          column(4, div(style = "height:10px;"), h4("Realization of actual parameters: act. volumes and act. expenses", offset = 1))
+          column(
+            6,
+            div(style = "height:10px;"),
+            h4(
+              "Estimation of budgeted parameters: cap. volumes, bud. volumes, bud. expenses, and variators"
+            )
+          ),
+          column(
+            4,
+            div(style = "height:10px;"),
+            h4(
+              "Realization of actual parameters: act. volumes and act. expenses",
+              offset = 1
+            )
+          )
         ),
         fluidRow(
           div(style = "height:10px;"),
@@ -216,18 +236,29 @@ ui <- fluidPage(
       "Inspection of Results",
       fluidPage(
         fluidRow(column(
-          12, titlePanel("Results of flexible budgeting using an capacity-based ABC approach with flexible and committed resources"),
+          12,
+          titlePanel(
+            "Results of flexible budgeting using an capacity-based ABC approach with flexible and committed resources"
+          ),
           offset = 1
         )),
-        fluidRow(
-          div(style = "height:10px;"), column(8, h4("Table 1: Results of flexible budgeting grouped by periods"))
-        ),
+        fluidRow(div(style = "height:10px;"), column(
+          8, h4("Table 1: Results of flexible budgeting grouped by periods")
+        )),
         fluidRow(DT::dataTableOutput("table_main_result")),
-        fluidRow(
-          div(style = "height:10px;"),
-          column(5, h4("Table 2: Cost pool data of selected period grouped by activities and res.")),
-          column(5, h4("Table 3: Activity pool data of selected period grouped by activities"))
-        ),
+        fluidRow(div(style = "height:10px;"),
+                 column(
+                   5,
+                   h4(
+                     "Table 2: Cost pool data of selected period grouped by activities and res."
+                   )
+                 ),
+                 column(
+                   5,
+                   h4(
+                     "Table 3: Activity pool data of selected period grouped by activities"
+                   )
+                 )),
         fluidRow(
           div(style = "height:5px;"),
           column(4, DT::dataTableOutput("table_cost_pool")),
@@ -245,77 +276,64 @@ ui <- fluidPage(
         DT::dataTableOutput("table_chart_of_accounts")
       )
     ),
-    tabPanel(
-      "Bill of Material",
-      fluidPage(
-        fluidRow(column(
-          12, titlePanel("Bill of Material (BOM)"),
-          offset = 5
-        )),
-        DT::dataTableOutput("table_bill_of_materials")
-      )
-    ),
-    tabPanel(
-      "Routing",
-      fluidPage(
-        fluidRow(column(12, titlePanel("Routing"),
-          offset = 5
-        )),
-        DT::dataTableOutput("table_rounting")
-      )
-    ),
+    tabPanel("Bill of Material",
+             fluidPage(
+               fluidRow(column(
+                 12, titlePanel("Bill of Material (BOM)"),
+                 offset = 5
+               )),
+               DT::dataTableOutput("table_bill_of_materials")
+             )),
+    tabPanel("Routing",
+             fluidPage(
+               fluidRow(column(12, titlePanel("Routing"),
+                               offset = 5)),
+               DT::dataTableOutput("table_rounting")
+             )),
     navbarMenu(
       "More",
-      tabPanel(
-        "About",
-        fluidPage(
-          fluidRow(
-            column(2, uiOutput("img_tuwien_logo")),
-            column(4, textOutput("txt_about"))
-          )
-        )
-      ),
-      tabPanel(
-        "Database",
-        sidebarLayout(
-          sidebarPanel(
-            fluidRow(
-              selectInput(
-                "table_selector",
-                "Select a table to display",
-                selected = "tb_general_ledger_account",
-                choices = sort(
-                  c(
-                    "tb_general_ledger_account",
-                    "tb_finished_good",
-                    "tb_material",
-                    "tb_activity",
-                    "tb_routing_position",
-                    "tb_bill_of_material_position",
-                    "tb_resource_cost_driver_rate",
-                    "tb_planning_period",
-                    "tb_cost_object_structure",
-                    "tb_quantity_structure",
-                    "tb_account_expense_structure",
-                    "tb_resource_expense_structure",
-                    "tb_activity_level_structure",
-                    "tb_cost_pool_position",
-                    "tb_activity_pool_position"
-                  )
-                ),
-                width = "415px"
-              )
-            ),
-            fluidRow(column(
-              3,
-              actionButton("reset_db_button", "Reset database", width = "200px"),
-              div(style = "height:20px;"),
-              offset = 4
-            ))
-          ),
-          mainPanel(DT::dataTableOutput("table_database"))
-        )
-      )
+      tabPanel("About",
+               fluidPage(fluidRow(
+                 column(2, uiOutput("img_tuwien_logo")),
+                 column(4, textOutput("txt_about"))
+               ))),
+      tabPanel("Database",
+               sidebarLayout(
+                 sidebarPanel(fluidRow(
+                   selectInput(
+                     "table_selector",
+                     "Select a table to display",
+                     selected = "tb_general_ledger_account",
+                     choices = sort(
+                       c(
+                         "tb_general_ledger_account",
+                         "tb_finished_good",
+                         "tb_material",
+                         "tb_activity",
+                         "tb_routing",
+                         "tb_bill_of_material",
+                         "tb_resource_cost_driver",
+                         "tb_planning_period",
+                         "tb_cost_object_structure",
+                         "tb_production_volume",
+                         "tb_operating_expense",
+                         "tb_resource_expense_structure",
+                         "tb_activity_level",
+                         "tb_cost_pool",
+                         "tb_activity_pool"
+                       )
+                     ),
+                     width = "415px"
+                   )
+                 ),
+                 fluidRow(column(
+                   3,
+                   actionButton("reset_db_button", "Reset database", width = "200px"),
+                   div(style = "height:20px;"),
+                   offset = 4
+                 ))),
+                 mainPanel(DT::dataTableOutput("table_database"))
+               ))
     )
   )
 )
