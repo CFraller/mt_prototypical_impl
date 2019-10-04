@@ -710,7 +710,7 @@ server <- function(input, output, session) {
       )
     )
     sqldf(paste(
-      readLines("./sql_scripts/naive_callibration_1.sql"),
+      readLines("./sql_scripts/insert_naive_callibration_ex_ante.sql"),
       collapse = "\n"
     ))
     sqldf(
@@ -730,7 +730,7 @@ server <- function(input, output, session) {
       )
     )
     sqldf(paste(
-      readLines("./sql_scripts/naive_callibration_2.sql"),
+      readLines("./sql_scripts/insert_naive_callibration_ex_post.sql"),
       collapse = "\n"
     ))
     periods <- sqldf("
@@ -767,7 +767,7 @@ server <- function(input, output, session) {
         as.numeric(input[[as.character(expensesInputFields$Var[i])]])
       )
     }
-    sqldf(paste(readLines("./sql_scripts/user_input_1.sql"),
+    sqldf(paste(readLines("./sql_scripts/insert_expert_estimation_ex_ante.sql"),
                 collapse = "\n"))
     sqldf(
       sprintf(
@@ -799,7 +799,7 @@ server <- function(input, output, session) {
                              expensesInputFields$Account[i],
                              as.numeric(input[[as.character(expensesInputFields$ActExp[i])]]))
     }
-    sqldf(paste(readLines("./sql_scripts/user_input_2.sql"),
+    sqldf(paste(readLines("./sql_scripts/insert_expert_estimation_ex_post.sql"),
                 collapse = "\n"))
     sqldf(
       sprintf(
@@ -856,7 +856,7 @@ server <- function(input, output, session) {
   # Reset database event
   observeEvent(input$reset_db_button, {
     sqldf(paste(
-      readLines("./sql_scripts/reset_drop_tables.sql"),
+      readLines("./sql_scripts/reset_database.sql"),
       collapse = "\n"
     ))
     initializeDatabase()
