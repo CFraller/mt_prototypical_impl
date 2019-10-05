@@ -240,7 +240,7 @@ ui <- fluidPage(
         fluidRow(column(
           12,
           titlePanel(
-            "Results of flexible budgeting using an capacity-based ABC approach with flexible and committed resources"
+            "Results of flexible budgeting using a capacity-based ABC approach with flexible and committed resources"
           ),
           offset = 1
         )),
